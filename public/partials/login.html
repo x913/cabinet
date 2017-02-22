@@ -1,0 +1,47 @@
+<style>
+    .center_div {
+        margin-top: 50px;
+        width: 40%/* value of your choice which suits your alignment */
+    }
+
+    .ba {
+        border: 1px solid black;
+    }
+
+</style>
+
+<div class="container center_div">
+    <div class="row"  >
+        <div class="panel panel-default">
+            <div class="panel-heading"><b>Авторизация доступа</b></div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <form action="" class="form-inlinea">
+                            <div class="col-xs-6">
+                                <input type="text" id="inn" class="form-control input-xs" placeholder="ИНН" ng-model="email" >
+                            </div>
+                            <div class="col-xs-6">
+                                <input type="text" id="password" class="form-control input-xs" placeholder="Пароль" ng-model="password">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <button class="btn btn-primary" ng-click="signin()" ng-disabled="submitDisabled()">Войти</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="container" ng-show="error_notify">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="alert alert-danger">
+                <strong>{{error_message}}</strong>
+            </div>
+        </div>
+    </div>
+</div>

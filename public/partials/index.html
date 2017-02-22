@@ -1,0 +1,83 @@
+<div ng-include="'/partials/navigation.html'">
+</div>
+
+<div class="row">
+    <div class="col-xs-12 well">
+        <ul class="media-list">
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">Наименование клиента</h4>
+                    <p>{{base_client.full_name}}</p>
+                </div>
+            </li>
+
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">Юридический адрес клиента</h4>
+                    <p>{{base_client.address_jur}}</p>
+                </div>
+            </li>
+
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">Почтовый адрес клиента</h4>
+                    <p>{{base_client.address_post}}</p>
+                </div>
+            </li>
+
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 well">
+        <div class="well" ng-show="!contracts.length">
+            <h3>Абонентские платы отсутствуют</h3>
+        </div>
+
+        <ul class="media-list" ng-hide="!contracts.length">
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">Список договоров</h4>
+                    <table class="table table-condensed table-hover">
+                        <tr ng-repeat="contract in contracts">
+                            <td> {{formatContract(contract)}} </td>
+                        </tr>
+                    </table>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 well">
+
+        <div class="well" ng-show="!fixed_fees.length">
+            <h3>Абонентские платы отсутствуют</h3>
+        </div>
+
+        <ul class="media-list" ng-hide="!fixed_fees.length">
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">Абонентские платы</h4>
+                    <table class="table table-condensed table-hover">
+                        <thead>
+                        <th>Наименование</th>
+                        <th>Кол-во</th>
+                        <th>Цена за ед. руб.</th>
+                        <th>Сумма, руб. без НДС</th>
+                        </thead>
+                        <tr ng-repeat="fixed_fee in fixed_fees | orderBy: 'descr' ">
+                            <td>{{fixed_fee.descr}}</td>
+                            <td>{{fixed_fee.cnt}}</td>
+                            <td>{{fixed_fee.tariff / fixed_fee.cnt | number: 2}}</td>
+                            <td>{{fixed_fee.tariff | number:2}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </li>
+        </ul>
+
+    </div>
+</div>

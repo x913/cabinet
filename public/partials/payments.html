@@ -1,0 +1,42 @@
+<div ng-include="'/partials/navigation.html'">
+</div>
+
+
+<div class="row">
+    <div class="col-xs-12 well">
+
+        <div class="well" ng-show="!payments.length">
+            <h3>Платежи отсутствуют</h3>
+        </div>
+
+
+        <ul class="media-list" ng-hide="!payments.length">
+
+            <h3 class="page-header">Поступившие платежи
+                <span class="pull-right">
+                    <input type="text" placeholder="Поиск по дате платежа" class="form-control" ng-model="search">
+                </span>
+            </h3>
+
+            <table class="table table-condensed table-hover">
+
+                <tbody>
+                    <tr ng-repeat="(key, value) in payments | filter: search | groupBy: 'payment_date'">
+                        <td>
+                            <b>{{key}}</b>
+                            <div ng-repeat="payment in value">
+                                <span class="label label-primary">{{payment.payment_sum | number:2 }} руб.</span>
+                            </div>
+                            <div>
+                                <b class="label label-success">ИТОГО: {{subTotal(value) | number:2 }} руб.</b>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+
+        </ul>
+    </div>
+
+</div>

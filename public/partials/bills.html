@@ -1,0 +1,45 @@
+<script type="text/javascript">
+    var sortingOrder = 'bill_date';
+</script>
+
+<div ng-include="'/partials/navigation.html'">
+</div>
+
+<div class="row">
+    <div class="col-xs-12 well">
+
+        <div class="well" ng-show="!bills.length">
+            <h3>Выставленные счета отсутствуют</h3>
+        </div>
+
+        <ul class="media-list" ng-hide="!bills.length">
+
+        
+            <h3 class="page-header">Выставленные счета
+                <span class="pull-right">
+                    <input type="text" placeholder="Поиск по счетам" class="form-control" ng-model="search">
+                </span>
+            </h3>
+
+            <table class="table table-hover table-condensed table-striped" id="billsTable">
+
+                <tr ng-repeat="(key, value) in bills | filter: search | groupBy: 'bill_date'">
+                    <td colspan="2">
+                        <h4>Счета за период {{key}} <a class="glyphicon glyphicon-list-alt" data-id="{{bill.bill_id}}" title="Загрузить детализацию за период" ng-click="downloadDetails(key)"  style="cursor: pointer"></a></h4>
+                        <p ng-repeat="bill in value">
+                            <a class="glyphicon glyphicon-download-alt" data-id="{{bill.bill_id}}" title="Загрузить счет" ng-click="downloadBill(bill.bill_id)" style="cursor: pointer"></a>
+                            <span class="label label-info">{{bill.bill_number}}</span>
+                            <span class="label label-primary">{{bill.bill_sum | number:2}} руб.</span>
+                        </p>
+                        <div>
+                            <b class="label label-success">ИТОГО: {{subTotal(value) | number:2 }} руб.</b>
+                        </div>
+                    </td>
+                </tr>
+
+            </table>
+        </ul>
+
+    </div>
+
+</div>

@@ -1,0 +1,36 @@
+<?php
+
+return [
+
+    'sign_up' => [
+        'release_token' => env('SIGN_UP_RELEASE_TOKEN'),
+        'validation_rules' => [
+            'name' => 'required',
+            'email' => 'required|digits_between:6,12',
+            'password' => 'required'
+        ]
+    ],
+
+    'login' => [
+        'validation_rules' => [
+            'email' => 'required|digits_between:6,12',
+            'password' => 'required'
+        ]
+    ],
+
+    'forgot_password' => [
+        'validation_rules' => [
+            'email' => 'required|email'
+        ]
+    ],
+
+    'reset_password' => [
+        'release_token' => env('PASSWORD_RESET_RELEASE_TOKEN', false),
+        'validation_rules' => [
+            'token' => 'required',
+            'email' => 'required|digits_between:6,12',
+            'password' => 'required|confirmed'
+        ]
+    ]
+
+];

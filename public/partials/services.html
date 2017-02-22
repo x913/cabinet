@@ -1,0 +1,64 @@
+<div ng-include="'/partials/navigation.html'">
+</div>
+
+
+<div class="row">
+    <div class="col-xs-12 well">
+
+        <div class="well" ng-show="!services.length">
+            <h3>Абонентские номера отсутствуют</h3>
+        </div>
+
+        <ul class="media-list" ng-hide="!services.length">
+            <h3 class="page-header">Абонентские номера
+                <span class="pull-right">
+                    <input type="text" placeholder="Поиск по номерам" class="form-control" ng-model="search">
+                </span>
+            </h3>
+
+            <table class="table table-condensed table-hover">
+                <tbody>
+                <tr ng-repeat="service in services | filter: search ">
+                    <td>
+                        <p><span class="glyphicon glyphicon-phone-alt"></span>&nbsp;<b>{{service.user_id}}</b> ({{service.phone_type}}) </p>
+                        <p>
+                            <span class="glyphicon glyphicon-edit" title="Редактировать адрес установки" ng-click="editor(service, 'address_mount')"></span>&nbsp;<b>Адрес установки</b>
+                        </p>
+                        <div ng-dblclick="editor(service, 'address_mount')">
+                            <div ng-hide="service.editing_address_mount">{{service.address_mount}}</div>
+                            <div ng-show="service.editing_address_mount">
+                                <input type="text" class="form-control input-xs" ng-model="service.address_mount" autofocus />
+                                <p style="padding-top: 15px">
+                                    <button ng-click="doneEditing(service, 'address_mount')" class="btn btn-success btn-xs">Сохранить</button>
+                                    <button ng-click="cancelEditing(service, 'address_mount')" class="btn btn-warning btn-xs">Отмена</button>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- примечание -->
+
+                        <p>
+                            <p>
+                                <span class="glyphicon glyphicon-edit" title="Редактировать примечание" ng-click="editor(service, 'descr')"></span>&nbsp;<b>Примечание</b>
+                            </p>
+                            <div ng-dblclick="editor(service, 'descr')">
+                                <div ng-hide="service.editing_descr">{{service.descr}}</div>
+                                <div ng-show="service.editing_descr">
+                                    <input type="text" class="form-control input-xs" ng-model="service.descr" autofocus />
+                                    <p style="padding-top: 15px">
+                                        <button ng-click="doneEditing(service, 'descr')" class="btn btn-success btn-xs">Сохранить</button>
+                                        <button ng-click="cancelEditing(service, 'descr')" class="btn btn-warning btn-xs">Отмена</button>
+                                    </p>
+                                </div>
+                            </div>
+                        </p>
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+        </ul>
+    </div>
+
+</div>

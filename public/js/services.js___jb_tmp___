@@ -1,0 +1,19 @@
+/**
+ * Created by k3kc on 14.02.2017.
+ */
+
+var cabinetAppServices = angular.module('cabinetAppServices', ['LocalStorageModule']);
+
+cabinetAppServices.factory('userService', ['localStorageService', function(localStorageService) {
+    return {
+        checkIfLoggedIn: function() {
+            return localStorageService.get('token') ==! null;
+        },
+        signin: function() {
+            console.log('hello, world');
+        },
+        logout: function() {
+            localStorageService.remove('token');
+        }
+    }
+}]);
