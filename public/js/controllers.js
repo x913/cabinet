@@ -1,20 +1,87 @@
 /**
  * Created by k3kc on 14.02.2017.
  */
+//var filter = angular.module('');
 
 var cabinetAppControllers = angular.module('cabinetAppControllers', ['angular.filter']);
 
+cabinetAppControllers.filter('sumTotal', function() {
+   return function (list, sumField) {
+       var total = 0;
+       angular.forEach(list, function(item) {
+          total += (item[sumField] * 1);
+       });
+       return total;
+   }
+});
 
-cabinetAppControllers.controller('PaymentController', ['$scope', 'clientService', function($scope, clientService) {
-    clientService.getPayments(function(response) { $scope.payments = response; }, function(response) { console.log('error'); } );
+cabinetAppControllers.filter('groupByFieldEx', function() {
+    return function(list, groupBy) {
+        var filtered = [];
+        angular.forEach(list, function(item) {
+            var seen = false;
+            for(var i = 0; i < filtered.length; i++) {
+                if(filtered[i] == item[groupBy]) {
+                    seen = true;
+                    break;
+                }
+            }
+            if(!seen)
+                filtered.push(item[groupBy]);
+        });
+        return filtered;
+    }
+});
 
-    $scope.subTotal = function(items) {
-        var total = 0;
-        for(var n in items) {
-            total += (items[n].payment_sum * 1);
+cabinetAppControllers.filter('groupByField', function() {
+    return function(list, groupBy, sumBy) {
+
+        function sumTotal(currentItem) {
+            var totalSum = 0;
+            angular.forEach(list, function(item) {
+                if(item[groupBy] == currentItem[groupBy])
+                    totalSum += item[sumBy] * 1;
+            });
+            return totalSum;
         }
-        return total;
-    };
+
+        var filtered = [];
+        var prevItem = null;
+        var groupChanged = false;
+        var changeField = groupBy + '_changed';
+        angular.forEach(list, function(item) {
+            groupChanged = false;
+
+            if(prevItem != null) {
+                if(prevItem[groupBy] !== item[groupBy]) {
+                    groupChanged = true;
+                    item[changeField] = true;
+                    item.total_sum = sumTotal(item);
+                }
+            } else {
+                groupChanged = true;
+                item.total_sum = sumTotal(item);
+            }
+
+            if(groupChanged) {
+                item[changeField] = true;
+            } else {
+                item[changeField] = false;
+            }
+            filtered.push(item);
+            prevItem = item;
+        });
+        return filtered;
+    }
+});
+
+cabinetAppControllers.controller('PaymentController', ['$scope', 'paymentService', function($scope, paymentService) {
+
+    paymentService.getPayments(function(response) {
+        $scope.payments = response;
+    }, function(response) {
+
+    });
 
 }]);
 
@@ -73,98 +140,45 @@ cabinetAppControllers.controller('SignupController', [ '$scope', '$location', 'u
 
 }]);
 
-cabinetAppControllers.controller('BillController', ['$scope', 'clientService', function($scope, clientService) {
+cabinetAppControllers.controller('BillController', ['$scope', 'billService', function($scope, billService) {
 
-    $scope.subTotal = function(items) {
-        var total = 0;
-        for(var n in items) {
-            total += (items[n].bill_sum * 1);
-        }
-        return total;
-    };
-
-    clientService.getClients(function(response) {
-        $scope.base_client = response.base_client;
-    }, function(response) {
-        console.log(response.statusText);
-    });
-
-    clientService.getBills(function(response) {
-        $scope.bills = response;
-    }, function(response) {
-        console.log(response.statusText);
-    });
-
-    $scope.sortColumnBy = function(newSortingOrder) {
-        if($scope.sortingOrder == newSortingOrder) {
-            $scope.reverse = !$scope.reverse;
-        }
-        $scope.sortingOrder = newSortingOrder;
-    };
-
-    var loading = false;
-
-    $scope.downloadDetails = function(date) {
-        clientService.getDetails(date, function(response) {
-            var blob = new Blob([response], {type: "application/pdf"})
-            saveAs(blob, 'details_' + date + ".pdf");
-        }, function(response) {
-            loading = false;
-        });
+    $scope.isEven = function(index) {
+        return index % 3 == 0;
     };
 
     $scope.downloadBill = function(id) {
-            if(loading) {
-                alert('Загрузка счета уже идет, ожидайте...');
-                return;
-            }
-            loading = true;
+        billService.getBillById(id, function(response) {
+            var blob = new Blob([response], {type: "text/plain;charset=utf-8"});
+            saveAs(blob, 'bill_' + id + ".html");
+        }, function(response) {});
+    };
 
-            $('a[data-id="' + id + '"]').removeClass('glyphicon-download-alt');
-            $('a[data-id="' + id + '"]').addClass('glyphicon-refresh');
 
-            clientService.getBillById(id, function(response) {
-                var blob = new Blob([response], {type: "text/plain;charset=utf-8"})
-                saveAs(blob, 'bill_' + id + ".html");
-                $('a[data-id="' + id + '"]').removeClass('glyphicon-refresh');
-                $('a[data-id="' + id + '"]').addClass('glyphicon-download-alt');
-                loading = false;
-            }, function(response) {
-                loading = false;
+    $scope.downloadDetails = function(date) {
+        billService.getDetails(date, function(response) {
+            var blob = new Blob([response], {type: "application/pdf"});
+            saveAs(blob, 'details_' + date + ".pdf");
+        }, function(response) {
+
         });
     };
 
-}]);
-
-cabinetAppControllers.controller('ServiceController', ['$scope', 'clientService', function($scope, clientService) {
-
-    clientService.getServices(function(response) {
-        $scope.services = response;
-    }, function(response) {
-        console.log(response.statusText);
+    billService.getBills(function(response) {
+        $scope.bills = response;
+    }, function (response) {
+        alert('Something wrong: bill request failed');
     });
 
-    $scope.editor = function(item, element) {
-        item['editing_' + element] = true;
-        item.oldValue = item[element];
-    };
+}]);
 
-    $scope.cancelEditing = function(item, element) {
-        item['editing_' + element] = false;
-        item[element] = item.oldValue;
-    };
+cabinetAppControllers.controller('ServiceController', ['$scope', 'phoneService', function($scope, phoneService) {
+    
+    phoneService.get(function (response) {
+        $scope.services = response;
+    }, function (response) {
 
-    $scope.doneEditing = function(item, element) {
-        console.log('doneEditing');
-        item['editing_' + element] = false;
-        if(item.oldValue != item[element]) {
-            clientService.updateService(item, function(response) {}, function(response) {});
-        } else {
-            console.log('values don`t need to update');
-        }
-    };
-
-
+    });
+    
 }]);
 
 cabinetAppControllers.controller('NavController', ['$scope', 'userService', '$location', 'clientService', function($scope, userService, $location, clientService) {
@@ -172,20 +186,45 @@ cabinetAppControllers.controller('NavController', ['$scope', 'userService', '$lo
         userService.signout();
         console.log('signout');
         $location.path('/signin');
-    }
+    };
 
-    clientService.getClients(function(response) {
+    clientService.getClient(function(response) {
         $scope.base_client = response.base_client;
     });
 
 }]);
 
 cabinetAppControllers.controller('MainController', ['$scope', 'userService', '$location', 'clientService', function($scope, userService, $location, clientService) {
-    if(!userService.isSignedIn()) {
-        console.log('You are not signed in');
-        $location.path('signin');
-        return;
-    }
+    $scope.detailTypes = [{id: 1, title: 'исходящие местные вызовы'}, {id: 2, title: 'исходящие междугородние вызовы'}, {id: 4, title: 'все входящие вызовы'}];
+
+    clientService.getClient(function(response) {
+        $scope.base_client = response.base_client;
+        angular.forEach($scope.detailTypes, function(detail) {
+            detail.selected = detail.id == (detail.id & $scope.base_client.details_type);
+        });
+    }, function(response) {
+        //alert(response);
+    });
+
+
+    $scope.btnShowA = function() {
+        $scope.btnShow = true;
+    };
+
+    $scope.saveDetails = function() {
+        $scope.btnShow = false;
+        var value = 0;
+        angular.forEach($scope.detailTypes, function(detail) {
+            if(detail.selected)
+                value += detail.id;
+        });
+        $scope.base_client.details_type = value;
+        clientService.updateClient($scope.base_client, function(response) {
+            console.log($scope.base_client);
+        }, function(response) {
+
+        });
+    };
 
     $scope.formatContract = function(contract)
     {
@@ -193,26 +232,37 @@ cabinetAppControllers.controller('MainController', ['$scope', 'userService', '$l
         return item.charAt(0).toUpperCase() + item.slice(1);
     };
 
-    clientService.getClients(function(response) {
-        $scope.base_client = response.base_client;
+    $scope.selectedDetails = function(id, value) {
+        return id & value;
+    };
 
-        clientService.getContracts(function(response) {
-            $scope.contracts = response;
+    // edit base_client email and contact phone
+    $scope.editor = function(item, element) {
+        item['editing_' + element] = true;
+        item.oldValue = item[element];
+    };
 
-            clientService.getFixedFees(function(response) {
-                $scope.fixed_fees = response;
-            }, function(response) {
-                console.log(response.statusText);
-            });
-
-
+    $scope.doneEditing = function(item, element) {
+        item['editing_' + element] = false;
+        clientService.updateClient($scope.base_client, function(response) {
+            console.log($scope.base_client);
+            $scope.base_client['error_' + element] = false;
         }, function(response) {
-            console.log(response.statusText);
+            item[element] = item.oldValue;
+            $scope.base_client['error_' + element] = true;
+            //alert('Не удалось сохранить значение, проверьте правильность ввода данных');
         });
+    };
 
-    }, function(response) {
-        console.log(response.statusText);
-    });
+    $scope.cancelEditing = function(item, element) {
+        item['editing_' + element] = false;
+        item[element] = item.oldValue;
+    };
+
+    if(!userService.isSignedIn()) {
+        $location.path('signin');
+        return;
+    }
 
 }]);
 

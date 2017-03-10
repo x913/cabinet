@@ -29,8 +29,7 @@ class DetailController extends Controller
             'form_params' => [
                 'oper_id' => 'RT',
                 'client_ids' => $currentUser->client_id,
-                'dateFrom' => '2017-01-01',
-                'dateTo' => '2017-01-31 23:59',
+                'dateTo' => $date,
                 'detailsType' => 1
             ]
         ]);

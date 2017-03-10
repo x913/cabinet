@@ -13,4 +13,6 @@ class Payment extends Model
 
     protected $fillable = [];
 
+    protected $visible = ['payment_date_str', 'payment_sum', 'client_id'];
+
 }

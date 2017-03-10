@@ -87,9 +87,6 @@ cabinetAppServices.factory('userService', ['$http', 'localStorageService', 'Rest
                 email: email,
                 password: password
             }).then(function(response) {
-                //localStorageService.set('token', response.data.token);
-                //Restangular.setDefaultHeaders({'Authorization': 'Bearer ' + response.data.token});
-
                 var lastLogin = localStorageService.get('login');
                 if(lastLogin != email) {
                     // reset cache
@@ -131,46 +128,40 @@ cabinetAppServices.factory('userService', ['$http', 'localStorageService', 'Rest
                 });
             } else {
                 // no token in localstorage
-                console.log('no token in local storage');
             }
         }
     }
 }]);
 
-cabinetAppServices.factory('clientService', ['Restangular', '$cacheFactory', function(Restangular, $cacheFactory) {
-
-    //Restangular.setDefaultHeaders({'Authorization': 'Bearer ' + userService.getToken()});
+cabinetAppServices.factory('clientService', ['Restangular', '$cacheFactory', 'userService', function(Restangular, $cacheFactory, userService) {
 
     return {
-        getClients: function(onSuccess, onError) {
+        getClient: function(onSuccess, onError) {
+
+            if(!userService.isSignedIn()) {
+                return;
+            }
+
             Restangular.one('api/base_clients').get().then(function(response) {
                 onSuccess(response);
             }, function(response) {
                 onError(response);
             });
         },
-        getServices: function(onSuccess, onError) {
-            Restangular.all('api/services').getList().then(function(response) {
+        updateClient: function(client, onSuccess, onError) {
+            Restangular.one('api/base_clients/' + client.client_id).customPUT(client).then(function(response) {
+                var httpCache = $cacheFactory.get('$http');
+                httpCache.remove('/api/base_clients');
                 onSuccess(response);
             }, function(response) {
                 onError(response);
             });
-        },
-        getContracts: function(onSuccess, onError) {
+        }
+    }
+}]);
 
-            Restangular.one('api/contracts/').get().then(function(response) {
-                onSuccess(response);
-            }, function(response) {
-                onError(response);
-            });
-        },
-        getFixedFees: function(onSuccess, onError) {
-            Restangular.one('api/fixed_fees').get().then(function(response) {
-                onSuccess(response);
-            }, function(response) {
-                onError(response);
-            });
-        },
+cabinetAppServices.factory('billService', ['Restangular', '$cacheFactory', function(Restangular, $cacheFactory) {
+    return {
         getBills: function(onSuccess, onError) {
             Restangular.one('api/bills').get().then(function(response) {
                 onSuccess(response);
@@ -186,20 +177,62 @@ cabinetAppServices.factory('clientService', ['Restangular', '$cacheFactory', fun
             });
         },
         getDetails: function(date, onSuccess, onError) {
-            Restangular.one('api/details/' + date).get().then(function(response) {
+            Restangular.one('api/details/' + date).withHttpConfig({responseType: 'arraybuffer'}).get().then(function(response) {
                 onSuccess(response);
             }, function(response) {
                 onError(response);
             });
-        },
+        }
+    }
+}]);
+
+cabinetAppServices.factory('contractService', ['Restangular', '$cacheFactory', function(Restangular, $cacheFactory) {
+    return {
+        getContracts: function(onSuccess, onError) {
+
+            Restangular.one('api/contracts/').get().then(function(response) {
+                onSuccess(response);
+            }, function(response) {
+                onError(response);
+            });
+        }
+    }
+}]);
+
+cabinetAppServices.factory('paymentService', ['Restangular', '$cacheFactory', function(Restangular, $cacheFactory) {
+    return {
         getPayments: function(onSuccess, onError) {
             Restangular.all('api/payments').getList().then(function(response) {
                 onSuccess(response);
             }, function(response) {
                 onError(response);
             });
+        }
+    }
+}]);
+
+cabinetAppServices.factory('feeService', ['Restangular', '$cacheFactory', function(Restangular, $cacheFactory) {
+    return {
+        getFixedFees: function(onSuccess, onError) {
+            Restangular.one('api/fixed_fees').get().then(function(response) {
+                onSuccess(response);
+            }, function(response) {
+                onError(response);
+            });
+        }
+    }
+}]);
+
+cabinetAppServices.factory('phoneService', ['Restangular', '$cacheFactory', function(Restangular, $cacheFactory) {
+    return {
+        get: function(onSuccess, onError) {
+            Restangular.all('api/services').getList().then(function(response) {
+                onSuccess(response);
+            }, function(response) {
+                onError(response);
+            });
         },
-        updateService: function(service, onSuccess, onError) {
+        update: function(service, onSuccess, onError) {
             Restangular.one('api/services/' + service.id).customPUT(service).then(function(response) {
                 var httpCache = $cacheFactory.get('$http');
                 httpCache.remove('/api/services');
@@ -208,7 +241,5 @@ cabinetAppServices.factory('clientService', ['Restangular', '$cacheFactory', fun
                 onError(response);
             });
         }
-
     }
 }]);
-

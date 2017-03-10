@@ -20,6 +20,9 @@ $api->version('v1', function (Router $api) {
     //$api->group(['middleware' => ['before' => 'jwt.auth', 'after' => 'jwt.refresh']], function(Router $api) {
     $api->group(['middleware' => ['jwt.auth']], function(Router $api) {
         $api->get('base_clients', 'App\\Api\\V1\\Controllers\\BaseClientController@index');
+        $api->put('base_clients/{id}', 'App\\Api\\V1\\Controllers\\BaseClientController@update');
+
+
         $api->get('services', 'App\\Api\\V1\\Controllers\\ServiceController@index');
         $api->get('contracts', 'App\\Api\\V1\\Controllers\\ContractController@index');
         $api->get('fixed_fees', 'App\\Api\\V1\\Controllers\\FixedFeeController@index');
@@ -31,6 +34,9 @@ $api->version('v1', function (Router $api) {
 
         $api->get('details/{date}', 'App\\Api\\V1\\Controllers\\DetailController@show');
         $api->put('services/{id}', 'App\\Api\\V1\\Controllers\\ServiceController@update');
+
+        $api->get('stz_departments', 'App\\Api\\V1\\Controllers\\StzDepartmentController@index');
+
 
 
         $api->get('protected', function() {

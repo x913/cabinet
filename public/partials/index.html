@@ -11,17 +11,84 @@
                 </div>
             </li>
 
-            <li class="media">
+            <li class="media" ng-if="base_client.address_jur">
                 <div class="media-body">
                     <h4 class="media-heading">Юридический адрес клиента</h4>
                     <p>{{base_client.address_jur}}</p>
                 </div>
             </li>
 
-            <li class="media">
+            <li class="media" ng-if="base_client.address_post">
                 <div class="media-body">
                     <h4 class="media-heading">Почтовый адрес клиента</h4>
-                    <p>{{base_client.address_post}}</p>
+                    <div>
+                        {{base_client.address_post}}
+                    </div>
+                </div>
+            </li>
+
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">ИНН</h4>
+                    <p>{{base_client.inn}}</p>
+                </div>
+            </li>
+
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">Контактные данные <span class="glyphicon glyphicon-edit" style="cursor: pointer" title="Редактировать" ng-click="editor(base_client, 'contact_phone')"></span></h4>
+                    <div ng-hide="base_client.editing_contact_phone">{{base_client.contact_phone}}</div>
+                    <div ng-show="base_client.editing_contact_phone">
+                        <div>
+                            <input type="text" ng-model="base_client.contact_phone" class="form-control">
+                        </div>
+                        <div style="padding-top: 15px">
+                            <button class="btn btn-primary btn-xs" ng-click="doneEditing(base_client, 'contact_phone')">Сохранить</button>
+                            <button class="btn btn-warning btn-xs" ng-click="cancelEditing(base_client, 'contact_phone')">Отмена</button>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger" ng-show="base_client.error_contact_phone">
+                        Не удалось сохранить контактные данные, допустимо не больше 200 символов!
+                    </div>
+
+
+                </div>
+            </li>
+
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">Адрес электронной почты <span class="glyphicon glyphicon-edit" style="cursor: pointer" title="Редактировать" ng-click="editor(base_client, 'contact_email')"></span></h4>
+                    <div ng-hide="base_client.editing_contact_email">
+                        {{base_client.contact_email}}
+                    </div>
+                    <div ng-show="base_client.editing_contact_email">
+                        <div>
+                            <input type="text" ng-model="base_client.contact_email" class="form-control">
+                        </div>
+                        <div style="padding-top: 15px">
+                            <button class="btn btn-primary btn-xs" ng-click="doneEditing(base_client, 'contact_email')">Сохранить</button>
+                            <button class="btn btn-warning btn-xs" ng-click="cancelEditing(base_client, 'contact_email')">Отмена</button>
+                        </div>
+                    </div>
+                    <div class="alert alert-danger" ng-show="base_client.error_contact_email">
+                        Не удалось сохранить email адрес, проверьте правильность ввода!
+                    </div>
+                </div>
+            </li>
+
+            <li class="media" ng-if="base_client.contact_email">
+                <div class="media-body">
+                    <h4 class="media-heading">Получать детализацию переговоров на электронную почту</span></h4>
+                    <ul style="list-style-type: none" ng-repeat="value in detailTypes">
+                        <li>
+                            <input type="checkbox" id="checkbox_{{value.id}}" ng-model="value.selected" ng-click="btnShowA()" >
+                            <label for="checkbox_{{value.id}}">{{value.title}}</label>
+                        </li>
+                    </ul>
+                    <div class="well" ng-show="btnShow">
+                        <button class="btn btn-primary btn-xs" ng-click="saveDetails()">Сохранить</button>
+                    </div>
                 </div>
             </li>
 
@@ -31,17 +98,29 @@
 
 <div class="row">
     <div class="col-xs-12 well">
-        <div class="well" ng-show="!contracts.length">
-            <h3>Абонентские платы отсутствуют</h3>
+        <div class="well" ng-show="!base_client.contracts.length">
+            <h3>Договора отсутствуют</h3>
         </div>
 
-        <ul class="media-list" ng-hide="!contracts.length">
+        <ul class="media-list" ng-hide="!base_client.contracts.length">
             <li class="media">
                 <div class="media-body">
                     <h4 class="media-heading">Список договоров</h4>
-                    <table class="table table-condensed table-hover">
-                        <tr ng-repeat="contract in contracts">
-                            <td> {{formatContract(contract)}} </td>
+                    <table class="table table-condensed">
+
+                        <thead>
+                            <tr>
+                                <th>Наименование</th>
+                                <th>Дата заключения</th>
+                                <th>Дата расторжения</th>
+
+                            </tr>
+                        </thead>
+
+                        <tr ng-repeat="contract in base_client.contracts" ng-class="{'bg-success': contract.is_main == 1}" >
+                            <td  > {{formatContract(contract)}} </td>
+                            <td> {{contract.date_active}} </td>
+                            <td> {{contract.last_date}} </td>
                         </tr>
                     </table>
                 </div>
@@ -53,11 +132,11 @@
 <div class="row">
     <div class="col-xs-12 well">
 
-        <div class="well" ng-show="!fixed_fees.length">
+        <div class="well" ng-show="!base_client.fixed_fees.length">
             <h3>Абонентские платы отсутствуют</h3>
         </div>
 
-        <ul class="media-list" ng-hide="!fixed_fees.length">
+        <ul class="media-list" ng-hide="!base_client.fixed_fees.length">
             <li class="media">
                 <div class="media-body">
                     <h4 class="media-heading">Абонентские платы</h4>
@@ -65,10 +144,10 @@
                         <thead>
                         <th>Наименование</th>
                         <th>Кол-во</th>
-                        <th>Цена за ед. руб.</th>
-                        <th>Сумма, руб. без НДС</th>
+                        <th>Цена, руб.</th>
+                        <th>Сумма, руб.</th>
                         </thead>
-                        <tr ng-repeat="fixed_fee in fixed_fees | orderBy: 'descr' ">
+                        <tr ng-repeat="fixed_fee in base_client.fixed_fees | orderBy: 'descr' ">
                             <td>{{fixed_fee.descr}}</td>
                             <td>{{fixed_fee.cnt}}</td>
                             <td>{{fixed_fee.tariff / fixed_fee.cnt | number: 2}}</td>

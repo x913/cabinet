@@ -8,6 +8,8 @@
 
 namespace App\Api\V1\Controllers;
 use App\Service;
+use App\Contract;
+use App\TelephoneType;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use JWTAuth;
@@ -20,9 +22,12 @@ class ServiceController extends Controller
     use Helpers;
 
     public function index() {
-        $currentUser = JWTAuth::parseToken()->authenticate();
-        $client = BaseClient::GetByClientId($currentUser->client_id);
-        return $client->telephoneServices()->orderBy('user_id')->get()->toArray();
+        $user = JWTAuth::parseToken()->authenticate();
+
+        return Service::with('PhoneType')->with('Contract')->where('client_id', '=', $user->client_id)
+            ->get()
+            ->toArray();
+
     }
 
     public function update(Request $request, $id) {

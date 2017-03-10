@@ -14,6 +14,8 @@ class FixedFee extends Model
     protected $fillable = [
 
     ];
+
+    //protected $visible = ['client_id', 'cnt', 'tariff'];
     
     public static function GetByClientId($id) {
         return self::where('client_id', '=', $id)->first();

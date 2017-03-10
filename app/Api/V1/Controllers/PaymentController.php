@@ -19,11 +19,11 @@ class PaymentController extends Controller
     use Helpers;
 
     public function index() {
-        $currentUser = JWTAuth::parseToken()->authenticate();
-        $client = BaseClient::GetByClientId($currentUser->client_id);
-        return $client->payments()
-            ->select('payment_id', 'payment_number', DB::raw("to_char(payment_date, 'DD.MM.YYYY') as payment_date"), DB::raw('payment_sum::numeric(10,2) as payment_sum'))
-            ->orderBy('payment_date', 'desc')
+        $user = JWTAuth::parseToken()->authenticate();
+
+        return Payment::where('client_id', '=', $user->client_id)
+            ->select('payment_id', 'payment_number', 'payment_sum', DB::raw("to_char(payment_date, 'DD.MM.YYYY') as payment_date_str"))
+            ->orderBy('payment_date', 'descr')
             ->get()
             ->toArray();
     }

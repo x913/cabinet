@@ -2,44 +2,60 @@
     var sortingOrder = 'bill_date';
 </script>
 
-<div ng-include="'/partials/navigation.html'">
-</div>
+<style>
+    @media (min-width: 992px) {
+        .col-xs-4 > .panel > .panel-body {
+            min-height: 150px;
+        }
+    }
+</style>
+
+<div ng-include="'/partials/navigation.html'"></div>
 
 <div class="row">
-    <div class="col-xs-12 well">
+    <div class="col-xs-12">
 
         <div class="well" ng-show="!bills.length">
             <h3>Выставленные счета отсутствуют</h3>
         </div>
 
-        <ul class="media-list" ng-hide="!bills.length">
+        <div ng-repeat="bill in bills | filter : search as bills_filtered"></div>
 
-        
-            <h3 class="page-header">Выставленные счета
+        <div class="page-header" ng-show="bills.length">
+            <h3>Выставленные счета (найдено {{bills_filtered.length}} на сумму {{ bills_filtered | sumTotal : 'bill_sum' | number : 2 }} руб.)
                 <span class="pull-right">
                     <input type="text" placeholder="Поиск по счетам" class="form-control" ng-model="search">
                 </span>
             </h3>
+        </div>
 
-            <table class="table table-hover table-condensed table-striped" id="billsTable">
 
-                <tr ng-repeat="(key, value) in bills | filter: search | groupBy: 'bill_date'">
-                    <td colspan="2">
-                        <h4>Счета за период {{key}} <a class="glyphicon glyphicon-list-alt" data-id="{{bill.bill_id}}" title="Загрузить детализацию за период" ng-click="downloadDetails(key)"  style="cursor: pointer"></a></h4>
-                        <p ng-repeat="bill in value">
-                            <a class="glyphicon glyphicon-download-alt" data-id="{{bill.bill_id}}" title="Загрузить счет" ng-click="downloadBill(bill.bill_id)" style="cursor: pointer"></a>
-                            <span class="label label-info">{{bill.bill_number}}</span>
-                            <span class="label label-primary">{{bill.bill_sum | number:2}} руб.</span>
-                        </p>
-                        <div>
-                            <b class="label label-success">ИТОГО: {{subTotal(value) | number:2 }} руб.</b>
-                        </div>
-                    </td>
-                </tr>
+        <div ng-repeat="date in bills_filtered | groupByFieldEx : 'bill_date_str'" >
 
-            </table>
-        </ul>
+            <div class="col-xs-4">
+                <div class="panel panel-success">
+                    <div class="panel panel-heading">
+                        <h4>
+                            <span class="glyphicon glyphicon-list-alt" title="Загрузить детализацию за период {{date}} г." ng-click="downloadDetails(date)"  style="cursor: pointer"></span>
+                            {{date}} г.
+                        </h4>
+                    </div>
+                    <div class="panel panel-body">
+                        <ul ng-repeat="bill in bills | filter : date | orderBy : 'bill_number' ">
+                           <li>
+                               <span class="label label-info " style="cursor: pointer" title="Загрузить счет" ng-click="downloadBill(bill.bill_id)"><b>{{bill.bill_number}}</b></span>
+                               &nbsp;{{bill.bill_sum | number : 2}} руб.
+                           </li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-footer">
+                        <b>ИТОГО: {{ bills | filter : date | sumTotal : 'bill_sum' | number : 2 }} руб.</b>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
 
     </div>
-
 </div>

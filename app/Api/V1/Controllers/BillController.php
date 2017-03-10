@@ -21,7 +21,7 @@ class BillController extends Controller
     public function index() {
         $currentUser = JWTAuth::parseToken()->authenticate();
         $client = BaseClient::GetByClientId($currentUser->client_id);
-        return $client->bills()->select('bill_sum', 'bill_id', 'bill_number', DB::raw("to_char(bill_date, 'DD.MM.yyyy') as bill_date"))->orderBy('bill_date', 'desc')->get()->toArray();
+        return $client->bills()->select('bill_sum', 'bill_id', 'bill_number', DB::raw("to_char(bill_date, 'DD.MM.yyyy') as bill_date_str"))->orderBy('bill_date', 'desc')->get()->toArray();
     }
 
     public function show($id)

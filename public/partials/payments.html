@@ -1,42 +1,65 @@
 <div ng-include="'/partials/navigation.html'">
 </div>
 
+<style>
+
+    .equal, .equal > div[class*='col-'] {
+        display: -webkit-flex;
+        display: flex;
+        flex:1 1 auto;
+    }
+
+    @media (min-width: 992px) {
+        .col-xs-4 > .panel > .panel-body {
+            min-height: 150px;
+        }
+    }
+
+</style>
+
 
 <div class="row">
-    <div class="col-xs-12 well">
-
+    <div class="col-xs-12">
         <div class="well" ng-show="!payments.length">
             <h3>Платежи отсутствуют</h3>
         </div>
 
+        <div ng-repeat="payment in payments | filter : search as payments_filtered"></div>
 
-        <ul class="media-list" ng-hide="!payments.length">
-
-            <h3 class="page-header">Поступившие платежи
+        <div class="page-header" ng-show="payments.length">
+            <h3>Поступившие платежи (найдено {{payments_filtered.length}} на сумму {{ payments_filtered | sumTotal : 'payment_sum' | number : 2 }} руб.)
                 <span class="pull-right">
-                    <input type="text" placeholder="Поиск по дате платежа" class="form-control" ng-model="search">
+                    <input type="text" placeholder="Поиск по платежам" class="form-control" ng-model="search">
                 </span>
             </h3>
+        </div>
 
-            <table class="table table-condensed table-hover">
+        <div ng-repeat="date in payments_filtered | groupByFieldEx : 'payment_date_str'">
 
-                <tbody>
-                    <tr ng-repeat="(key, value) in payments | filter: search | groupBy: 'payment_date'">
-                        <td>
-                            <b>{{key}}</b>
-                            <div ng-repeat="payment in value">
-                                <span class="label label-primary">{{payment.payment_sum | number:2 }} руб.</span>
-                            </div>
-                            <div>
-                                <b class="label label-success">ИТОГО: {{subTotal(value) | number:2 }} руб.</b>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
+            <div class="col-xs-4">
+                <div class="panel panel-success">
 
-            </table>
+                    <div class="panel panel-heading">
+                        <h4>
+                            {{date}} г.
+                        </h4>
+                    </div>
 
-        </ul>
+                    <div class="panel panel-body">
+                        <ul ng-repeat="payment in payments | filter : date">
+                            <li>{{payment.payment_sum | number : 2}} руб.</li>
+                        </ul>
+                    </div>
+
+                    <div class="panel panel-footer">
+                        <b>ИТОГО: {{ payments | filter : date | sumTotal : 'payment_sum' | number : 2 }} руб.</b>
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+
     </div>
-
 </div>
