@@ -30,7 +30,7 @@ class BaseClient extends Model
 
     protected $visible = [
         'client_id', 'balance', 'inn', 'kpp', 'name', 'full_name', 'address_jur', 'address_post', 'contact_phone', 'contact_email', 'details_type',
-        'Bills', 'Contracts', 'FixedFees'
+        'Bills', 'Contracts', 'FixedFees', 'Emails'
     ];
 
     public function telephoneServices()
@@ -107,6 +107,7 @@ class BaseClient extends Model
             ->select(
                 'contract_contracts.client_id',
                 'contract_contracts.is_main',
+                'contract_contracts.limit_sum',
                 DB::raw('CASE WHEN contract_contracts.contract_date >= \'01.01.2014\' then
                             contract_contract_types.descr || \' &#8470;\' || contract_contracts.contract_number || to_char(contract_contracts.contract_date, \' от DD.MM.YY г.\')
                          else
@@ -134,10 +135,19 @@ class BaseClient extends Model
             ->orderBy('fixed_fee_types.descr');
     }
 
+    public function Emails() {
+        return $this->hasMany('App\BaseEmailAddress', 'client_id', 'client_id')->orderBy('id');
+    }
+
 
     public static function GetByClientId($id) {
 
-        $data = BaseClient::with('clientBills')->with('Contracts')->with('FixedFees')->where('base_clients.client_id', '=', $id)->firstOrFail(); # !working
+        $data = BaseClient::with('clientBills')
+            ->with('Contracts')
+            ->with('FixedFees')
+            ->with('Emails')
+            ->where('base_clients.client_id', '=', $id)
+            ->firstOrFail();
         return $data;
         #return self::where('client_id', '=', $id)->firstOrFail();
     }

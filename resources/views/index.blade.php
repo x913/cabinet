@@ -20,16 +20,13 @@
     <script src="js/app.js"></script>
     <script src="js/controllers.js"></script>
     <script src="js/services.js"></script>
-    <title>Document</title>
+    <title>Личный Кабинет - ЗАО "РАДИОТЕЛЕФОН"</title>
 
     <style>
         body {
             background: lightgray;
         }
 
-        .br {
-            border: 0px solid black;
-        }
     </style>
 
 

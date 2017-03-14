@@ -5,7 +5,7 @@
 <style>
     @media (min-width: 992px) {
         .col-xs-4 > .panel > .panel-body {
-            min-height: 150px;
+            min-height: 250px;
         }
     }
 </style>
@@ -19,42 +19,62 @@
             <h3>Выставленные счета отсутствуют</h3>
         </div>
 
-        <div ng-repeat="bill in bills | filter : search as bills_filtered"></div>
+        <div ng-repeat="bill in bills | filter : { bill_date_str : search  } as bills_filtered"></div>
 
-        <div class="page-header" ng-show="bills.length">
-            <h3>Выставленные счета (найдено {{bills_filtered.length}} на сумму {{ bills_filtered | sumTotal : 'bill_sum' | number : 2 }} руб.)
-                <span class="pull-right">
-                    <input type="text" placeholder="Поиск по счетам" class="form-control" ng-model="search">
-                </span>
-            </h3>
+
+        <div class="page-header row" ng-show="bills.length" style="cursor: pointer">
+            <div class="form-group">
+                <div class="col-xs-8">
+                    <h3 title="{{bills_filtered.length}} cчетов на сумму {{ bills_filtered | sumTotal : 'bill_sum' | number : 2 }} руб.">
+                        Выставленные счета (найдено {{bills_filtered.length}})
+                    </h3>
+                </div>
+                <div class="col-xs-4">
+                    <h3>
+                        <input type="text" placeholder="Поиск по счетам" class="form-control" ng-model="search" title="Поиск по дате счета, например 02.2017 отобразит счета за февраль 2017 года">
+                    </h3>
+                </div>
+
+            </div>
         </div>
 
-
-        <div ng-repeat="date in bills_filtered | groupByFieldEx : 'bill_date_str'" >
+        <div ng-repeat="date in bills_filtered | groupByFieldEx : 'bill_date_str' ">
 
             <div class="col-xs-4">
                 <div class="panel panel-success">
                     <div class="panel panel-heading">
-                        <h4>
-                            <span class="glyphicon glyphicon-list-alt" title="Загрузить детализацию за период {{date}} г." ng-click="downloadDetails(date)"  style="cursor: pointer"></span>
-                            {{date}} г.
-                        </h4>
+                        <h4><span class="glyphicon glyphicon-list-alt" style="padding-right: 5px"></span>{{periodName(date)}} г.</h4>
                     </div>
+
                     <div class="panel panel-body">
-                        <ul ng-repeat="bill in bills | filter : date | orderBy : 'bill_number' ">
-                           <li>
-                               <span class="label label-info " style="cursor: pointer" title="Загрузить счет" ng-click="downloadBill(bill.bill_id)"><b>{{bill.bill_number}}</b></span>
-                               &nbsp;{{bill.bill_sum | number : 2}} руб.
-                           </li>
+                        <ul ng-repeat="bill in bills_filtered | filter : { bill_date_str : date }" style="list-style-type: none">
+                            <li style="cursor: pointer" title="Загрузить счет {{bill.bill_number}} от {{bill.bill_date_str}}"  ng-click="downloadBill(bill)">
+                                <span class="glyphicon glyphicon-download" ></span>
+                                <span class="label label-info">{{bill.bill_number}}</span>
+                                {{bill.bill_sum | number : 2 }} руб.
+                                <span class="help-block"><small>{{formatContract(bill.contract)}}</small></span>
+                            </li>
                         </ul>
                     </div>
+
                     <div class="panel panel-footer">
-                        <b>ИТОГО: {{ bills | filter : date | sumTotal : 'bill_sum' | number : 2 }} руб.</b>
+                        <div class="row">
+                            <div class="col-xs-6 text-left" style="cursor: pointer" ng-click="downloadDetails(date)" title="Загрузить детализацию за {{periodName(date)}} г.">
+                                <span class="glyphicon glyphicon-download" ></span> <b>Детализация</b>
+                            </div>
+                            <div class="col-xs-6 text-right" title="Общая сумма выставленных счетов за {{ periodName(date) }} г." style="cursor: pointer">
+                                <p style="white-space: nowrap"><b>ИТОГО: {{ bills_filtered | filter : { bill_date_str : date } | sumTotal : 'bill_sum' | number : 2 }} руб.</b></p>
+                            </div>
+                        </div>
+
                     </div>
+
                 </div>
             </div>
 
         </div>
+
+
 
 
     </div>

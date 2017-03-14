@@ -11,7 +11,7 @@
 
     @media (min-width: 992px) {
         .col-xs-4 > .panel > .panel-body {
-            min-height: 150px;
+            min-height: 200px;
         }
     }
 
@@ -26,33 +26,33 @@
 
         <div ng-repeat="payment in payments | filter : search as payments_filtered"></div>
 
-        <div class="page-header" ng-show="payments.length">
-            <h3>Поступившие платежи (найдено {{payments_filtered.length}} на сумму {{ payments_filtered | sumTotal : 'payment_sum' | number : 2 }} руб.)
+        <div class="page-header" ng-show="payments.length" title="{{payments_filtered.length}} платежей на сумму {{ payments_filtered | sumTotal : 'payment_sum' | number : 2 }} руб."  style="cursor: pointer">
+            <h3>Поступившие платежи (найдено {{payments_filtered.length}})
                 <span class="pull-right">
                     <input type="text" placeholder="Поиск по платежам" class="form-control" ng-model="search">
                 </span>
             </h3>
         </div>
 
-        <div ng-repeat="date in payments_filtered | groupByFieldEx : 'payment_date_str'">
+        <div ng-repeat="date in payments_filtered | groupByFieldEx : 'payment_date_month'">
 
             <div class="col-xs-4">
                 <div class="panel panel-success">
 
                     <div class="panel panel-heading">
                         <h4>
-                            {{date}} г.
+                            {{periodName(date)}} г.
                         </h4>
                     </div>
 
                     <div class="panel panel-body">
                         <ul ng-repeat="payment in payments | filter : date">
-                            <li>{{payment.payment_sum | number : 2}} руб.</li>
+                            <li>{{payment.payment_date_str}} г. <mark>{{payment.payment_sum | number : 2}} руб.</mark></li>
                         </ul>
                     </div>
 
-                    <div class="panel panel-footer">
-                        <b>ИТОГО: {{ payments | filter : date | sumTotal : 'payment_sum' | number : 2 }} руб.</b>
+                    <div class="panel panel-footer text-right" style="cursor: pointer" title="Сумма поступивших платежей за {{periodName(date)}} ">
+                        <p style="white-space: nowrap"><b>ИТОГО: {{ payments | filter : date | sumTotal : 'payment_sum' | number : 2 }} руб.</b></p>
                     </div>
 
                 </div>

@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use JWTAuth;
 use App\BaseClient;
 use App\Bill;
+use App\Contract;
 use Dingo\Api\Routing\Helpers;
 use GuzzleHttp\Client;
 use Illuminate\Http\Response;
@@ -19,9 +20,17 @@ class BillController extends Controller
     use Helpers;
 
     public function index() {
-        $currentUser = JWTAuth::parseToken()->authenticate();
-        $client = BaseClient::GetByClientId($currentUser->client_id);
-        return $client->bills()->select('bill_sum', 'bill_id', 'bill_number', DB::raw("to_char(bill_date, 'DD.MM.yyyy') as bill_date_str"))->orderBy('bill_date', 'desc')->get()->toArray();
+        $user = JWTAuth::parseToken()->authenticate();
+
+        return Bill::with('Contract')
+            ->select('contract_id', 'client_id', 'bill_sum', 'bill_id', 'bill_number', DB::raw("to_char(bill_date, 'DD.MM.yyyy') as bill_date_str"))
+            ->where('bill_bills.client_id', '=', $user->client_id)
+            ->orderBy('bill_date', 'desc')
+            ->get()->toArray();
+
+
+        //$client = BaseClient::GetByClientId($currentUser->client_id);
+        //return $client->bills()->select('bill_sum', 'bill_id', 'bill_number', DB::raw("to_char(bill_date, 'DD.MM.yyyy') as bill_date_str"))->orderBy('bill_date', 'desc')->get()->toArray();
     }
 
     public function show($id)

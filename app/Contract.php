@@ -11,7 +11,8 @@ class Contract extends Model
     protected $table = 'contract_contracts';
     public $incrementing = false;
     public $timestamps = false;
-    
+
+    //protected $visible = ['contract_id', 'client_id', 'comment', 'descr'];
     
     public static function GetByClientId($id) {
         return self::where('client_id', '=', $id)->first();

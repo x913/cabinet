@@ -156,6 +156,26 @@ cabinetAppServices.factory('clientService', ['Restangular', '$cacheFactory', 'us
             }, function(response) {
                 onError(response);
             });
+        },
+        addEmail: function(email, onSuccess, onError) {
+            Restangular.one('api/base_clients/email/').customPOST(email).then(function(response) {
+                var httpCache = $cacheFactory.get('$http');
+                httpCache.remove('/api/base_clients');
+                onSuccess(response);
+            }, function(response) {
+                onError(response);
+            });
+        },
+        removeEmail : function(email, onSuccess, onError) {
+            Restangular.one('api/base_clients/email/' + email.id).remove().then(function(response) {
+
+                var httpCache = $cacheFactory.get('$http');
+                httpCache.remove('/api/base_clients');
+                onSuccess(response);
+
+            }, function(response) {
+                onError(response);
+            });
         }
     }
 }]);

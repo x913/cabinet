@@ -23,6 +23,11 @@ $api->version('v1', function (Router $api) {
         $api->put('base_clients/{id}', 'App\\Api\\V1\\Controllers\\BaseClientController@update');
 
 
+        $api->post('base_clients/email', 'App\\Api\\V1\\Controllers\\BaseClientController@addEmail');
+        $api->delete('base_clients/email/{id}', 'App\\Api\\V1\\Controllers\\BaseClientController@removeEmail');
+
+
+
         $api->get('services', 'App\\Api\\V1\\Controllers\\ServiceController@index');
         $api->get('contracts', 'App\\Api\\V1\\Controllers\\ContractController@index');
         $api->get('fixed_fees', 'App\\Api\\V1\\Controllers\\FixedFeeController@index');
