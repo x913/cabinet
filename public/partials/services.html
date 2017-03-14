@@ -1,8 +1,123 @@
 <div ng-include="'/partials/navigation.html'">
 </div>
 
-
 <div class="row">
+    <div class="col-xs-12">
+        <div class="well" ng-show="!data.services.length">
+            <h3>Абонентские номера отсутствуют</h3>
+        </div>
 
+        <div ng-repeat="service in data.services | filter : search as services_filtered"></div>
 
+        <div class="row" ng-show="data.services.length" style="cursor: pointer">
+            <div class="form-group">
+                <div class="col-xs-8">
+                    <h3>
+                        Абонентские номера (найдено {{services_filtered.length}})
+                    </h3>
+                </div>
+                <div class="col-xs-4">
+                    <h3>
+
+                        <div class="input-group">
+                            <div class="input-group-btn">
+                                <button class="btn btn-default" title="Группировать абонентские номера по договору" ng-click="selectedReport('contract')"><span class="glyphicon glyphicon-list"></span></button>
+                                <button class="btn btn-default" title="Группировать абонентские номера по типу устройства"  ng-click="selectedReport('device_type')"><span class="glyphicon glyphicon-list-alt"></span></button>
+                            </div>
+                            <input type="text" placeholder="Поиск по номерам" class="form-control" ng-model="search" title="Поиск по номерам, например 378700">
+                        </div>
+
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12"><hr></div>
+        </div>
+
+        <div ng-repeat="phone_type in data.types" ng-show=" selected == 'device_type' ">
+            <div ng-repeat="service in services_filtered | filter : phone_type.descr as services_by_type"></div>
+
+            <div class="row" ng-show="services_by_type.length">
+                <h4 style="cursor: pointer" title="Нажмите чтобы развернуть или свернуть список номеров" ng-click="expandContract(phone_type)">
+                    <mark>
+                        <span ng-class="phone_type.expanded ? 'glyphicon glyphicon-minus' : 'glyphicon glyphicon-plus' " ></span>
+                        {{phone_type.descr}} (найдено {{services_by_type.length}})
+                    </mark>
+                </h4>
+
+                <table class="table table-condensed table-hover" ng-show="phone_type.expanded">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Тип устройства</th>
+                            <th>Дата установки</th>
+                            <th>Договор</th>
+                            <th>Абонентский номер</th>
+                            <th>Адрес установки</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="service in services_by_type">
+                            <td>{{$index + 1}}</td>
+                            <td>{{service.phone_type.descr}}</td>
+                            <td>
+                                <div ng-if="service.date_create_str">{{service.date_create_str}}</div>
+                                <div ng-if="!service.date_create_str">---</div>
+                            </td>
+                            <td> {{formatContract(service.contract)}} </td>
+                            <td>{{service.user_id}}</td>
+                            <td>
+                                <div ng-if="service.address_mount">{{service.address_mount}}</div>
+                                <div ng-if="!service.address_mount">---</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <div ng-repeat="contract in data.contracts" ng-show=" selected == 'contract' ">
+            <div ng-repeat="service in services_filtered | filter : { contract_id : contract.contract_id } as services_by_contract"></div>
+
+            <div class="row" ng-show="services_by_contract.length">
+                <h4 style="cursor: pointer" title="Нажмите чтобы развернуть или свернуть список номеров" ng-click="expandContract(contract)">
+                    <mark>
+                        <span ng-class="contract.expanded ? 'glyphicon glyphicon-minus' : 'glyphicon glyphicon-plus' " ></span>
+                        {{formatContract(contract)}} (найдено {{services_by_contract.length}})
+                    </mark>
+                </h4>
+
+                <table class="table table-condensed table-hover" ng-show="contract.expanded">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Тип устройства</th>
+                            <th>Дата установки</th>
+                            <th>Абонентский номер</th>
+                            <th>Адрес установки</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="service in services_by_contract">
+                            <td>{{$index + 1}}</td>
+                            <td>{{service.phone_type.descr}}</td>
+                            <td>
+                                <div ng-if="service.date_create_str">{{service.date_create_str}}</div>
+                                <div ng-if="!service.date_create_str">---</div>
+                            </td>
+                            <td>{{service.user_id}}</td>
+                            <td>
+                                <div ng-if="service.address_mount">{{service.address_mount}}</div>
+                                <div ng-if="!service.address_mount">---</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
 </div>

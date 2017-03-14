@@ -26,12 +26,25 @@
 
         <div ng-repeat="payment in payments | filter : search as payments_filtered"></div>
 
-        <div class="page-header" ng-show="payments.length" title="{{payments_filtered.length}} платежей на сумму {{ payments_filtered | sumTotal : 'payment_sum' | number : 2 }} руб."  style="cursor: pointer">
-            <h3>Поступившие платежи (найдено {{payments_filtered.length}})
-                <span class="pull-right">
-                    <input type="text" placeholder="Поиск по платежам" class="form-control" ng-model="search">
-                </span>
-            </h3>
+
+        <div class="row" ng-show="payments.length" style="cursor: pointer">
+            <div class="form-group">
+                <div class="col-xs-8">
+                    <h3 title="{{payments_filtered.length}} платежей на сумму {{ payments_filtered | sumTotal : 'payment_sum' | number : 2 }} руб.">
+                        Поступившие платежи (найдено {{payments_filtered.length}})
+                    </h3>
+                </div>
+                <div class="col-xs-4">
+                    <h3>
+                        <input type="text" placeholder="Поиск по платежам" class="form-control" ng-model="search" title="Поиск по дате платежа, например 02.2017 отобразит платежи за февраль 2017 года">
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <hr></div>
         </div>
 
         <div ng-repeat="date in payments_filtered | groupByFieldEx : 'payment_date_month'">

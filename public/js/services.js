@@ -11,8 +11,6 @@ cabinetAppServices.config(['$httpProvider', 'RestangularProvider', function($htt
     $httpProvider.interceptors.push('AuthInterceptor');
 }]);
 
-
-
 cabinetAppServices.factory('AuthInterceptor', ['$q', '$injector', 'localStorageService', '$location', function($q, $injector, localStorageService, $location) {
     var interceptor = {
 
@@ -246,7 +244,7 @@ cabinetAppServices.factory('feeService', ['Restangular', '$cacheFactory', functi
 cabinetAppServices.factory('phoneService', ['Restangular', '$cacheFactory', function(Restangular, $cacheFactory) {
     return {
         get: function(onSuccess, onError) {
-            Restangular.all('api/services').getList().then(function(response) {
+            Restangular.one('api/services').get().then(function(response) {
                 onSuccess(response);
             }, function(response) {
                 onError(response);

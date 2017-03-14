@@ -3,6 +3,7 @@
 namespace App;
 
 use DB;
+use JWTAuth;
 use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model
@@ -18,7 +19,7 @@ class Service extends Model
     ];
 
     protected $visible = [
-        'client_id', 'contract_id', 'date_create', 'user_id', 'PhoneType', 'Contract'
+        'client_id', 'contract_id', 'date_create', 'date_create_str', 'user_id', 'address_mount', 'PhoneType', 'Contract'
     ];
 
   /*  protected $visible = [
@@ -36,6 +37,7 @@ class Service extends Model
         return $this->hasOne('App\TelephoneType', 'type_id', 'phone_type')->where('oper_id', '=', 'RT');
     }
 
+    // contract for current service
     public function Contract()
     {
         return $this->hasOne('App\Contract', 'contract_id', 'contract_id')
@@ -58,7 +60,6 @@ class Service extends Model
                 }
             )
             ->orderBy('contract_contracts.date_active', 'desc');
-
     }
     
     public static function GetByClientId($id) {

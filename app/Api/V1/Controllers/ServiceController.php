@@ -13,6 +13,7 @@ use App\TelephoneType;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use JWTAuth;
+use DB;
 use App\BaseClient;
 use Dingo\Api\Routing\Helpers;
 
@@ -24,17 +25,27 @@ class ServiceController extends Controller
     public function index() {
         $user = JWTAuth::parseToken()->authenticate();
 
-        return Service::with('PhoneType')->with('Contract')->where('client_id', '=', $user->client_id)
-            ->get()
-            ->toArray();
+        return response()->json(
+            [
+                'services' =>
+                    Service::with('PhoneType')->with('Contract')
+                    ->select(
+                        'client_id', 'contract_id', 'date_create', 'user_id', 'address_mount', 'phone_type',
+                        DB::raw("case when date_create < '01.01.2000' then null else to_char(date_create, 'MM.DD.YYYY') end as date_create_str")
+                    )
+                    ->where([
+                        ['client_id', '=', $user->client_id],
+                        ['enabled', '=', '1'],
+                    ])->whereNull('date_expire')->get()->toArray(),
+                'contracts' => Contract::ClientContracts()->get()->toArray(),
+                'types' => TelephoneType::Types()->get()->toArray()
+            ]
+        );
 
     }
 
     public function update(Request $request, $id) {
-
-        // validate
-
-        $input = $request->all();
+/*        $input = $request->all();
         $input = array_only($input, ['address_mount', 'descr']);
 
         $currentUser = JWTAuth::parseToken()->authenticate();
@@ -55,7 +66,7 @@ class ServiceController extends Controller
         $service->address_mount = $input['address_mount'];
         $service->descr = $input['descr'];
 
-        $service->save();
+        $service->save();*/
     }
 
 }

@@ -205,14 +205,28 @@ cabinetAppControllers.controller('BillController', ['$scope', 'billService', 'ut
 
 }]);
 
-cabinetAppControllers.controller('ServiceController', ['$scope', 'phoneService', function($scope, phoneService) {
-    
+cabinetAppControllers.controller('ServiceController', ['$scope', 'phoneService', 'util', function($scope, phoneService, util) {
+
+    $scope.selected = 'contract';
+
+    $scope.selectedReport = function(report) {
+        $scope.selected = report;
+    };
+
+    $scope.formatContract = function(contract) {
+        return util.formatContract(contract);
+    };
+
     phoneService.get(function (response) {
-        $scope.services = response;
+        $scope.data = response;
     }, function (response) {
 
     });
-    
+
+    $scope.expandContract = function(contract) {
+        contract.expanded = !contract.expanded;
+    };
+
 }]);
 
 cabinetAppControllers.controller('NavController', ['$scope', 'userService', '$location', 'clientService', function($scope, userService, $location, clientService) {

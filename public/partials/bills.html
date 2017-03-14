@@ -21,8 +21,7 @@
 
         <div ng-repeat="bill in bills | filter : { bill_date_str : search  } as bills_filtered"></div>
 
-
-        <div class="page-header row" ng-show="bills.length" style="cursor: pointer">
+        <div class="row" ng-show="bills.length" style="cursor: pointer">
             <div class="form-group">
                 <div class="col-xs-8">
                     <h3 title="{{bills_filtered.length}} cчетов на сумму {{ bills_filtered | sumTotal : 'bill_sum' | number : 2 }} руб.">
@@ -34,8 +33,12 @@
                         <input type="text" placeholder="Поиск по счетам" class="form-control" ng-model="search" title="Поиск по дате счета, например 02.2017 отобразит счета за февраль 2017 года">
                     </h3>
                 </div>
-
             </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <hr></div>
         </div>
 
         <div ng-repeat="date in bills_filtered | groupByFieldEx : 'bill_date_str' ">
@@ -51,7 +54,7 @@
                             <li style="cursor: pointer" title="Загрузить счет {{bill.bill_number}} от {{bill.bill_date_str}}"  ng-click="downloadBill(bill)">
                                 <span class="glyphicon glyphicon-download" ></span>
                                 <span class="label label-info">{{bill.bill_number}}</span>
-                                {{bill.bill_sum | number : 2 }} руб.
+                                <mark>{{ bill.bill_sum | number : 2 }} руб.</mark>
                                 <span class="help-block"><small>{{formatContract(bill.contract)}}</small></span>
                             </li>
                         </ul>
