@@ -1,30 +1,45 @@
 <style>
-    .center_div {
+    .center-div {
         margin-top: 50px;
-        width: 40%/* value of your choice which suits your alignment */
+        width: 40%;
     }
 
-    .ba {
-        border: 1px solid black;
+    .top-buffer {
+        margin-top: 15px;
     }
 
 </style>
 
-<div class="container center_div">
+<div class="container center-div">
     <div class="row"  >
         <div class="panel panel-default">
-            <div class="panel-heading"><b>Авторизация доступа</b></div>
+            <div class="panel-heading"><b>Вход в личный кабинет</b></div>
             <div class="panel-body">
-                <div class="row">
-                    <div class="col-xs-12">
-                        <form action="" class="form-inlinea">
+
+                <div class="row top-buffer">
+                    <div class="col-xs-12 row">
+                        <form action="">
                             <div class="col-xs-6">
-                                <input type="text" id="inn" class="form-control input-xs" placeholder="ИНН" ng-model="email" >
+                                <input type="text" id="inn" class="form-control input-xs" placeholder="ИНН" ng-model="credentials.email" >
                             </div>
                             <div class="col-xs-6">
-                                <input type="password" id="password" class="form-control input-xs" placeholder="Пароль" ng-model="password">
+                                <input type="password" id="password" class="form-control input-xs" placeholder="Пароль" ng-model="credentials.password">
                             </div>
                         </form>
+                    </div>
+                </div>
+
+                <div class="row top-buffer">
+                    <div class="col-xs-12">
+                        <div vc-recaptcha
+                             theme="'light'"
+                             key="credentials.key"
+                             lang="ru"
+                             on-create="setWidgetId(widgetId)"
+                             on-success="setResponse(response)"
+                             on-expire="cbExpiration()">
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -32,8 +47,8 @@
                 <button class="btn btn-primary" ng-click="signin()" ng-disabled="submitDisabled()">Войти</button>
             </div>
         </div>
-
     </div>
+
 </div>
 
 <div class="container" ng-show="error_notify">

@@ -15,6 +15,7 @@
     <script src="bower_components/restangular/dist/restangular.js"></script>
     <script src="bower_components/angular-filter/dist/angular-filter.js"></script>
     <script src="bower_components/file-saver.js/FileSaver.js"></script>
+    <script src="bower_components/angular-recaptcha/release/angular-recaptcha.js"></script>
 
 
     <script src="js/app.js"></script>

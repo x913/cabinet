@@ -3,11 +3,13 @@
  */
 //var filter = angular.module('');
 
-var cabinetAppControllers = angular.module('cabinetAppControllers', ['angular.filter']);
+var cabinetAppControllers = angular.module('cabinetAppControllers', ['angular.filter', 'vcRecaptcha']);
 
 cabinetAppControllers.factory('util', function() {
     return {
         formatContract: function(contract) {
+            if(contract == null)
+                return;
             var item =  contract.contract_title.replace('&#8470;', 'N ');
             return item.charAt(0).toUpperCase() + item.slice(1);
         },
@@ -110,31 +112,58 @@ cabinetAppControllers.controller('PaymentController', ['$scope', 'paymentService
 
 }]);
 
-cabinetAppControllers.controller('LoginController', ['$scope', '$location', 'userService', function($scope, $location, userService) {
+cabinetAppControllers.controller('LoginController', ['$scope', '$location', 'userService', 'vcRecaptchaService', function($scope, $location, userService, vcRecaptchaService) {
+    
+    $scope.credentials = {
+        email: '',
+        password: '',
+        response: '',
+        key: '6LfM5RgUAAAAANhFnq68JV6IPLupnWHT3OMrzfQg'
+    };
+
+    $scope.setResponse = function(response) {
+        console.log('you got and response');
+        $scope.credentials.response = response;
+    };
+
+    $scope.setWidgetId = function (widgetId) {
+        console.info('Created widget ID: %s', widgetId);
+        $scope.widgetId = widgetId;
+    };
+
+    $scope.cbExpiration = function() {
+        $scope.credentials.response = null;
+        vcRecaptchaService.reload($scope.widgetId);
+    };
 
     $scope.signin = function() {
-        userService.signin($scope.email, $scope.password,
+
+        userService.signin($scope.credentials,
             function(response) {    // onSuccess
                 if(response.status == '200') {
                     $location.path('/');
                 } else {
                     $scope.error_notify = true;
+                    $scope.credentials.response = null;
                     $scope.error_message = "Ошибка авторизации доступа: неверная пара/логин пароль";
+                    vcRecaptchaService.reload($scope.widgetId);
                 }
             },
             function (response) {
                 $scope.error_notify = true;
+                $scope.credentials.response = null;
+                vcRecaptchaService.reload($scope.widgetId);
                 $scope.error_message = "Ошибка авторизации доступа: неверная пара/логин пароль";
             });
     };
 
     $scope.submitDisabled = function() {
-        return !$scope.email || !$scope.password;
+        return !$scope.credentials.email || !$scope.credentials.password || !$scope.credentials.response;
     };
 
     $scope.error_notify = false;
-    $scope.email = '';
-    $scope.password = '';
+    $scope.credentials.email = '';
+    $scope.credentials.password = '';
 
     if(userService.isSignedIn()) {
         console.log('you are signed in');
@@ -144,7 +173,7 @@ cabinetAppControllers.controller('LoginController', ['$scope', '$location', 'use
 }]);
 
 cabinetAppControllers.controller('SignupController', [ '$scope', '$location', 'userService', function($scope, $location, userService) {
-    $scope.signup = function() {
+/*    $scope.signup = function() {
         userService.signup($scope.name, $scope.email, $scope.password,
         function(response) {    // onSuccess
             alert('You are now signed in!');
@@ -156,7 +185,7 @@ cabinetAppControllers.controller('SignupController', [ '$scope', '$location', 'u
     };
     $scope.name = '';
     $scope.email = '';
-    $scope.password = '';
+    $scope.password = '';*/
 
     if(userService.isSignedIn()) {
         console.log('you are signed in');

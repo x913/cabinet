@@ -80,18 +80,17 @@ cabinetAppServices.factory('userService', ['$http', 'localStorageService', 'Rest
                 return false;
             }
         },
-        signin: function(email, password, onSuccess, onError) {
+        signin: function(credentials, onSuccess, onError) {
             $http.post('/api/auth/login', {
-                email: email,
-                password: password
+                credentials: credentials
             }).then(function(response) {
                 var lastLogin = localStorageService.get('login');
-                if(lastLogin != email) {
+                if(lastLogin != credentials.email) {
                     // reset cache
                     var httpCache = $cacheFactory.get('$http');
                     httpCache.removeAll();
                 }
-                localStorageService.set('login', email);
+                localStorageService.set('login', credentials.email);
                 
                 onSuccess(response);
             }, function(response) {
@@ -109,7 +108,7 @@ cabinetAppServices.factory('userService', ['$http', 'localStorageService', 'Rest
             }, function(response) {
                 onError(response);
             });
-        },
+        },  
         signout: function() {
             localStorageService.remove('token');
         },

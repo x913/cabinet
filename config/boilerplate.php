@@ -13,11 +13,12 @@ return [
 
     'login' => [
         'validation_rules' => [
-            'email' => 'required|digits_between:6,12',
-            'password' => 'required'
+            'credentials.email'     => 'required|digits_between:6,12',
+            'credentials.password'  => 'required',
+            'credentials.response'  => 'required'
         ]
     ],
-
+    
     'forgot_password' => [
         'validation_rules' => [
             'email' => 'required|email'
