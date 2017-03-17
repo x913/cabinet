@@ -122,12 +122,10 @@ cabinetAppControllers.controller('LoginController', ['$scope', '$location', 'use
     };
 
     $scope.setResponse = function(response) {
-        console.log('you got and response');
         $scope.credentials.response = response;
     };
 
     $scope.setWidgetId = function (widgetId) {
-        console.info('Created widget ID: %s', widgetId);
         $scope.widgetId = widgetId;
     };
 
@@ -166,7 +164,6 @@ cabinetAppControllers.controller('LoginController', ['$scope', '$location', 'use
     $scope.credentials.password = '';
 
     if(userService.isSignedIn()) {
-        console.log('you are signed in');
         $location.path('/');
     }
 
@@ -268,11 +265,20 @@ cabinetAppControllers.controller('NavController', ['$scope', 'userService', '$lo
 
     clientService.getClient(function(response) {
         $scope.base_client = response.base_client;
+    }, function (response) {
+        
     });
 
 }]);
 
 cabinetAppControllers.controller('MainController', ['$scope', 'userService', '$location', 'clientService', 'util', function($scope, userService, $location, clientService, util) {
+
+    $scope.isSignedIn = userService.isSignedIn();
+
+    if(!userService.isSignedIn()) {
+        $location.path('signin');
+        return;
+    }
 
     clientService.getClient(function(response) {
         $scope.base_client = response.base_client;
@@ -283,7 +289,7 @@ cabinetAppControllers.controller('MainController', ['$scope', 'userService', '$l
                 detail.selected = detail.id == (detail.id & email.detail_type);
             });
         });
-        console.log($scope.base_client);
+
     }, function(response) {
         //alert(response);
     });
@@ -302,7 +308,7 @@ cabinetAppControllers.controller('MainController', ['$scope', 'userService', '$l
         });
         $scope.base_client.details_type = value;
         clientService.updateClient($scope.base_client, function(response) {
-            console.log($scope.base_client);
+
         }, function(response) {
 
         });
@@ -401,11 +407,6 @@ cabinetAppControllers.controller('MainController', ['$scope', 'userService', '$l
         item['editing_' + element] = false;
         item[element] = item.oldValue;
     };
-
-    if(!userService.isSignedIn()) {
-        $location.path('signin');
-        return;
-    }
 
 }]);
 

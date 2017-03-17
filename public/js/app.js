@@ -3,6 +3,8 @@
  */
 var application = angular.module('cabinetApp', ['ngRoute', 'cabinetAppControllers', 'cabinetAppServices']);
 application.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+
+
     $routeProvider
         .when('/signin', {
             templateUrl: 'partials/login.html',
@@ -25,11 +27,13 @@ application.config(['$routeProvider', '$locationProvider', function($routeProvid
             controller: 'PaymentController'
         })
         .when('/', {
+
             templateUrl: 'partials/index.html',
             controller: 'MainController'
         })
         .otherwise({
             redirectTo: '/'
         });
+
         $locationProvider.html5Mode(true);
 }]);

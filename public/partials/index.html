@@ -1,7 +1,7 @@
-<div ng-include="'/partials/navigation.html'">
+<div ng-include="'/partials/navigation.html'" ng-show="isSignedIn">
 </div>
 
-<div class="row">
+<div class="row" ng-show="isSignedIn">
     <div class="col-xs-12 well">
         <ul class="media-list">
             <li class="media">

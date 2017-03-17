@@ -18,23 +18,21 @@ cabinetAppServices.factory('AuthInterceptor', ['$q', '$injector', 'localStorageS
             if(response.status == 401) {
                 console.log('GOT 401, NEED TO REFRESH TOKEN, DUE TO EXPIRED 1');
                 localStorageService.remove('token');
-                $location.path('/');
-                return $q(function () { return null; })
-              /*  var $http = $injector.get('$http');
-                var token = localStorageService.get('token');
-                console.log('OLD TOKEN ' + token);
+                $location.path('/signin');
+                return $q(function () {
+                    return null;
+                })
 
-                $http.get({
-                  method: 'GET',
-                  url: 'http://project1.dev/api/auth/token',
-                  header: {
-                      'Authorization': 'Bearer ' + token
-                  }
-                }).then(function(response) {
-                    localStorageService.set('token', response.data.token);
-                }, function(response) {
-                    console.log('something wrong while refreshing token');
-                });*/
+            } else if(response.status == 400) { // && (response.data.error == 'token_invalid' || response.data.error == 'token_not_provided')) {
+
+                console.log('GOT 400, NEED TO REFRESH TOKEN, DUE TO BAD REQUEST', response.data.error);
+
+                localStorageService.remove('token');
+                $location.path('/signin');
+                return $q(function () {
+                    return null;
+                })
+
             } else {
                 return $q.reject(response);
             }
