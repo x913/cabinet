@@ -3,7 +3,7 @@
  */
 //var filter = angular.module('');
 
-var cabinetAppControllers = angular.module('cabinetAppControllers', ['angular.filter', 'vcRecaptcha']);
+var cabinetAppControllers = angular.module('cabinetAppControllers', ['angular.filter', 'vcRecaptcha', 'ui.router']);
 
 cabinetAppControllers.factory('util', function() {
     return {
@@ -112,13 +112,24 @@ cabinetAppControllers.controller('PaymentController', ['$scope', 'paymentService
 
 }]);
 
-cabinetAppControllers.controller('LoginController', ['$scope', '$location', 'userService', 'vcRecaptchaService', function($scope, $location, userService, vcRecaptchaService) {
+cabinetAppControllers.controller('LoginController', ['$scope', '$location', 'userService', 'vcRecaptchaService', '$state', function($scope, $location, userService, vcRecaptchaService, $state) {
     
     $scope.credentials = {
         email: '',
         password: '',
         response: '',
         key: '6LfM5RgUAAAAANhFnq68JV6IPLupnWHT3OMrzfQg'
+    };
+    
+    $scope.passwordHidden = true;
+    $scope.passwordInputType = 'password';
+    
+    $scope.togglePasswordVisible = function() {
+        $scope.passwordHidden = !$scope.passwordHidden;
+        if($scope.passwordHidden)
+            $scope.passwordInputType = 'password';
+        else
+            $scope.passwordInputType = 'text';
     };
 
     $scope.setResponse = function(response) {
@@ -135,15 +146,18 @@ cabinetAppControllers.controller('LoginController', ['$scope', '$location', 'use
     };
 
     $scope.signin = function() {
-
+        $scope.signinProgress = true;
         userService.signin($scope.credentials,
             function(response) {    // onSuccess
                 if(response.status == '200') {
-                    $location.path('/');
+                    //$location.path('/');
+                    $state.go('profile');
+                    $scope.signinProgress = false;
                 } else {
                     $scope.error_notify = true;
                     $scope.credentials.response = null;
                     $scope.error_message = "Ошибка авторизации доступа: неверная пара/логин пароль";
+                    $scope.signinProgress = false;
                     vcRecaptchaService.reload($scope.widgetId);
                 }
             },
@@ -152,11 +166,12 @@ cabinetAppControllers.controller('LoginController', ['$scope', '$location', 'use
                 $scope.credentials.response = null;
                 vcRecaptchaService.reload($scope.widgetId);
                 $scope.error_message = "Ошибка авторизации доступа: неверная пара/логин пароль";
+                $scope.signinProgress = false;
             });
     };
 
     $scope.submitDisabled = function() {
-        return !$scope.credentials.email || !$scope.credentials.password || !$scope.credentials.response;
+        return !$scope.credentials.email || !$scope.credentials.password || !$scope.credentials.response || $scope.signinProgress;
     };
 
     $scope.error_notify = false;
@@ -164,7 +179,8 @@ cabinetAppControllers.controller('LoginController', ['$scope', '$location', 'use
     $scope.credentials.password = '';
 
     if(userService.isSignedIn()) {
-        $location.path('/');
+        console.log('user is signed in');
+        $state.go('profile');
     }
 
 }]);
@@ -184,10 +200,10 @@ cabinetAppControllers.controller('SignupController', [ '$scope', '$location', 'u
     $scope.email = '';
     $scope.password = '';*/
 
-    if(userService.isSignedIn()) {
-        console.log('you are signed in');
-        $location.path('/');
-    }
+    //if(userService.isSignedIn()) {
+        //console.log('you are signed in');
+        //$location.path('/');
+    //}
 
 }]);
 
@@ -255,12 +271,11 @@ cabinetAppControllers.controller('ServiceController', ['$scope', 'phoneService',
 
 }]);
 
-cabinetAppControllers.controller('NavController', ['$scope', 'userService', '$location', 'clientService', function($scope, userService, $location, clientService) {
+cabinetAppControllers.controller('NavController', ['$scope', 'userService', '$state', 'clientService', function($scope, userService, $state, clientService) {
 
     $scope.signout = function() {
         userService.signout();
-        console.log('signout');
-        $location.path('/signin');
+        $state.go('signin');
     };
 
     clientService.getClient(function(response) {
@@ -271,19 +286,18 @@ cabinetAppControllers.controller('NavController', ['$scope', 'userService', '$lo
 
 }]);
 
-cabinetAppControllers.controller('MainController', ['$scope', 'userService', '$location', 'clientService', 'util', function($scope, userService, $location, clientService, util) {
+cabinetAppControllers.controller('ProfileController', ['$scope', 'userService', '$state', 'clientService', 'util', function($scope, userService, $state, clientService, util) {
 
     $scope.isSignedIn = userService.isSignedIn();
 
     if(!userService.isSignedIn()) {
-        $location.path('signin');
+        $state.go('signin');
         return;
     }
 
     clientService.getClient(function(response) {
         $scope.base_client = response.base_client;
         angular.forEach($scope.base_client.emails, function(email) {
-            console.log(email.detail_type);
             email.details = [{id: 1, title: 'исходящие местные вызовы', selected: false}, {id: 2, title: 'исходящие междугородние вызовы', selected: false}, {id: 4, title: 'все входящие вызовы', selected: false}];
             angular.forEach(email.details, function (detail) {
                 detail.selected = detail.id == (detail.id & email.detail_type);

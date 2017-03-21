@@ -2,8 +2,6 @@
  * Created by k3kc on 14.02.2017.
  */
 
-
-
 var cabinetAppServices = angular.module('cabinetAppServices', ['LocalStorageModule', 'restangular']);
 
 cabinetAppServices.config(['$httpProvider', 'RestangularProvider', function($httpProvider, RestangularProvider) {
@@ -16,7 +14,6 @@ cabinetAppServices.factory('AuthInterceptor', ['$q', '$injector', 'localStorageS
 
         responseError: function(response) {
             if(response.status == 401) {
-                console.log('GOT 401, NEED TO REFRESH TOKEN, DUE TO EXPIRED 1');
                 localStorageService.remove('token');
                 $location.path('/signin');
                 return $q(function () {
@@ -24,15 +21,14 @@ cabinetAppServices.factory('AuthInterceptor', ['$q', '$injector', 'localStorageS
                 })
 
             } else if(response.status == 400) { // && (response.data.error == 'token_invalid' || response.data.error == 'token_not_provided')) {
-
-                console.log('GOT 400, NEED TO REFRESH TOKEN, DUE TO BAD REQUEST', response.data.error);
-
                 localStorageService.remove('token');
                 $location.path('/signin');
                 return $q(function () {
                     return null;
                 })
-
+            } else if (response.status == 429) {
+                alert('Для вашего IP адреса сработало ограничение на количество запросов к API сервиса, попробуйте повторить ваш запрос через несколько минут');
+                return $q.reject(response);
             } else {
                 return $q.reject(response);
             }

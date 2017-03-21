@@ -23,7 +23,14 @@
                                 <input type="text" id="inn" class="form-control input-xs" placeholder="ИНН" ng-model="credentials.email" >
                             </div>
                             <div class="col-xs-6">
-                                <input type="password" id="password" class="form-control input-xs" placeholder="Пароль" ng-model="credentials.password">
+                                <div class="input-group">
+                                    <input type="{{passwordInputType}}" id="password" class="form-control input-xs" placeholder="Пароль" ng-model="credentials.password">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-primary" ng-click="togglePasswordVisible()">
+                                            <span ng-class="passwordHidden ? 'glyphicon glyphicon-eye-open' : 'glyphicon glyphicon-eye-close' "></span>
+                                        </button>
+                                    </span>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -45,6 +52,7 @@
             </div>
             <div class="panel-footer">
                 <button class="btn btn-primary" ng-click="signin()" ng-disabled="submitDisabled()">Войти</button>
+                <img ng-src="img/circle-loader.gif" ng-show="signinProgress">
             </div>
         </div>
     </div>

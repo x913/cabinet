@@ -5,7 +5,7 @@ use Dingo\Api\Routing\Router;
 /** @var Router $api */
 $api = app(Router::class);
 
-$api->version('v1', function (Router $api) {
+$api->version('v1', ['middleware' => 'api.throttle', 'limit' => 100, 'expires' => 5], function (Router $api) {
 
     $api->group(['prefix' => 'auth'], function(Router $api) {
         $api->post('signup', 'App\\Api\\V1\\Controllers\\SignUpController@signUp');

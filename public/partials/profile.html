@@ -1,0 +1,249 @@
+<div ng-include="'/partials/navigation.html'" ng-show="isSignedIn">
+</div>
+
+<div class="row" ng-show="isSignedIn">
+    <div class="col-xs-12 well">
+        <ul class="media-list">
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">Наименование клиента</h4>
+                    <p>{{base_client.full_name}}</p>
+                </div>
+            </li>
+
+            <li class="media" ng-if="base_client.address_jur">
+                <div class="media-body">
+                    <h4 class="media-heading">Юридический адрес клиента</h4>
+                    <p>{{base_client.address_jur}}</p>
+                </div>
+            </li>
+
+            <li class="media" ng-if="base_client.address_post">
+                <div class="media-body">
+                    <h4 class="media-heading">Почтовый адрес клиента</h4>
+                    <div>
+                        {{base_client.address_post}}
+                    </div>
+                </div>
+            </li>
+
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">ИНН</h4>
+                    <p>{{base_client.inn}}</p>
+                </div>
+            </li>
+
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">Контактные данные <span class="glyphicon glyphicon-edit" style="cursor: pointer" title="Редактировать" ng-click="editor(base_client, 'contact_phone')"></span></h4>
+                    <div ng-hide="base_client.editing_contact_phone">{{base_client.contact_phone}}</div>
+                    <div ng-show="base_client.editing_contact_phone">
+                        <div>
+                            <input type="text" ng-model="base_client.contact_phone" class="form-control">
+                        </div>
+                        <div style="padding-top: 15px">
+                            <button class="btn btn-primary btn-xs" ng-click="doneEditing(base_client, 'contact_phone')">Сохранить</button>
+                            <button class="btn btn-warning btn-xs" ng-click="cancelEditing(base_client, 'contact_phone')">Отмена</button>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger" ng-show="base_client.error_contact_phone">
+                        Не удалось сохранить контактные данные, допустимо не больше 200 символов!
+                    </div>
+
+
+                </div>
+            </li>
+
+            <!--emails editor-->
+
+            <li class="media">
+
+                <div class="media-body">
+                    <h4 class="media-heading">Контактные адреса электронной почты: <span class="glyphicon glyphicon-plus" title="Добавить email адрес" style="cursor: pointer" ng-click="addEmail()"></span> </h4>
+
+                    <div ng-show="email.visible" class="well" >
+                        <div >
+                            <span><h4>Новый адрес электронной почты и комментарий:</h4></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <input type="text" ng-model="email.email" class="form-control" placeholder="Email адрес">
+
+                                <div class="alert alert-danger" ng-show="email.error_contact_email">
+                                    Не удалось сохранить email адрес, проверьте правильность ввода!
+                                </div>
+
+                            </div>
+                            <div class="col-xs-4">
+                                <input type="text" ng-model="email.comment"  class="form-control" placeholder="Комментарий">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <span><h4>Выберите нужные типы детализации: (которые вы хотите ежемесячно получать на электронную почту)</h4></span>
+                                <ul>
+                                    <li ng-repeat="detail in email.details">
+                                        <input type="checkbox" id="detail_{{detail.id}}" ng-model="detail.selected">
+                                        <label for="detail_{{detail.id}}" class="control-label">{{detail.title}}</label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <button class="btn btn-xs btn-primary" ng-click="saveAddEmailAddress()">Сохранить</button>
+                                <button class="btn btn-xs btn-warning" ng-click="cancelAddingEmailAddress()">Отмена</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <ul style="list-style-type: none">
+
+                        <li ng-repeat="email in base_client.emails">
+
+                            <div class="row-fluid" ng-hide="email.editing || email.removed">
+                                <span class="glyphicon glyphicon-edit" style="cursor: pointer" title="Редактировать email адрес" ng-click="editEmailAddress(email)"></span>
+                                <span class="glyphicon glyphicon-trash" style="cursor: pointer" title="Удалить email адрес" ng-click="removeEmailAddress(email)"></span>
+
+                                <span style="padding-right: 0px">{{email.email}} <span ng-show="email.comment">({{email.comment}})</span></span>
+                                <div style="display: inline-block"  ng-repeat="detail in email.details" ng-show="detail.selected">
+                                    <span class="label label-primary" style="cursor: pointer" title="Тип детализации, которая будет отправляться на email адрес {{email.email}}">{{detail.title}}&nbsp;</span>
+                                </div>
+                            </div>
+
+                            <div class="label label-danger" ng-show="email.remove_error" ng-click="emailRemoveHideError(email)" style="cursor: pointer">Ошибка удаления email адреса</div>
+                            <div class="label label-success" ng-show="email.remove_success">Адрес email успешно удален</div>
+
+                            <div ng-show="email.editing" class="well" >
+
+                                <span><h4>Укажите адрес электронной почты и комментарий:</h4></span>
+
+                                <div class="row">
+                                    <div class="col-xs-4">
+                                        <input type="text" ng-model="email.email" class="form-control" placeholder="Email адрес">
+
+                                        <div class="alert alert-danger" ng-show="email.error_contact_email">
+                                            Не удалось сохранить email адрес, проверьте правильность ввода!
+                                        </div>
+
+                                    </div>
+                                    <div class="col-xs-4">
+                                        <input type="text" ng-model="email.comment"  class="form-control" placeholder="Комментарий">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <span><h4>Выберите нужные типы детализации: (которые вы хотите ежемесячно получать на электронную почту)</h4></span>
+                                        <ul>
+                                            <li ng-repeat="detail in email.details">
+                                                <input type="checkbox" id="detail_{{email.id}}_{{detail.id}}" ng-model="detail.selected">
+                                                <label for="detail_{{email.id}}_{{detail.id}}" class="control-label">{{detail.title}}</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-4">
+                                        <button class="btn btn-xs btn-primary" ng-click="saveEmailAddress(email)">Сохранить</button>
+                                        <button class="btn btn-xs btn-warning" ng-click="cancelEditEmailAddress(email)">Отмена</button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </li>
+                    </ul>
+
+                </div>
+            </li>
+
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 well">
+        <div class="well" ng-show="!base_client.contracts.length">
+            <h3>Договора отсутствуют</h3>
+        </div>
+
+        <ul class="media-list" ng-hide="!base_client.contracts.length">
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">Список договоров</h4>
+                    <table class="table table-condensed">
+
+                        <thead>
+                            <tr>
+                                <th>Номер л\с</th>
+                                <th>Наименование</th>
+                                <th>Дата заключения</th>
+                                <th>Дата расторжения</th>
+                                <th>Баланс</th>
+                            </tr>
+                        </thead>
+
+                        <tfoot>
+                            <tr>
+                                <td colspan="5" class="alert alert-info text-right"><b>Общий баланс: {{base_client.balance | number : 2}} руб.</b></td>
+                            </tr>
+                        </tfoot>
+
+
+                        <tbody>
+                            <tr ng-repeat="contract in base_client.contracts" ng-class="{'bg-success': contract.is_main == 1}" >
+                                <td>{{base_client.client_id}}</td>
+                                <td>{{formatContract(contract)}}</td>
+                                <td>{{contract.date_active}}</td>
+                                <td>{{contract.last_date}}</td>
+                                <td>{{contract.limit_sum | number: 2}} руб.</td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 well">
+
+        <div class="well" ng-show="!base_client.fixed_fees.length">
+            <h3>Абонентские платы отсутствуют</h3>
+        </div>
+
+        <ul class="media-list" ng-hide="!base_client.fixed_fees.length">
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">Абонентские платы</h4>
+                    <table class="table table-condensed table-hover">
+                        <thead>
+                        <th>Наименование</th>
+                        <th>Кол-во</th>
+                        <th>Цена, руб.</th>
+                        <th>Сумма, руб.</th>
+                        </thead>
+                        <tr ng-repeat="fixed_fee in base_client.fixed_fees | orderBy: 'descr' ">
+                            <td>{{fixed_fee.descr}}</td>
+                            <td>{{fixed_fee.cnt}}</td>
+                            <td>{{fixed_fee.tariff / fixed_fee.cnt | number: 2}}</td>
+                            <td>{{fixed_fee.tariff | number:2}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </li>
+        </ul>
+
+    </div>
+</div>
