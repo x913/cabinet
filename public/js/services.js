@@ -2,30 +2,33 @@
  * Created by k3kc on 14.02.2017.
  */
 
-var cabinetAppServices = angular.module('cabinetAppServices', ['LocalStorageModule', 'restangular']);
+var cabinetAppServices = angular.module('cabinetAppServices', ['LocalStorageModule', 'restangular', 'ui.router']);
 
 cabinetAppServices.config(['$httpProvider', 'RestangularProvider', function($httpProvider, RestangularProvider) {
     RestangularProvider.setDefaultHttpFields({cache: true});
     $httpProvider.interceptors.push('AuthInterceptor');
 }]);
 
-cabinetAppServices.factory('AuthInterceptor', ['$q', '$injector', 'localStorageService', '$location', function($q, $injector, localStorageService, $location) {
+cabinetAppServices.factory('AuthInterceptor', ['$q', '$injector', 'localStorageService', '$timeout', function($q, $injector, localStorageService, $state, $timeout) {
     var interceptor = {
 
         responseError: function(response) {
             if(response.status == 401) {
                 localStorageService.remove('token');
-                $location.path('/signin');
-                return $q(function () {
-                    return null;
-                })
-
+                $timeout(function () {
+                   $state.go('signin');
+                });
+                return $q.reject();
             } else if(response.status == 400) { // && (response.data.error == 'token_invalid' || response.data.error == 'token_not_provided')) {
+                console.log('400');
                 localStorageService.remove('token');
-                $location.path('/signin');
-                return $q(function () {
-                    return null;
-                })
+                $timeout(function () {
+                    console.log('TIMEOUT');
+                    $state.go('signin');
+                }, 1000);
+                $state.go('signin');
+                return $q.reject(response);
+
             } else if (response.status == 429) {
                 alert('Для вашего IP адреса сработало ограничение на количество запросов к API сервиса, попробуйте повторить ваш запрос через несколько минут');
                 return $q.reject(response);
