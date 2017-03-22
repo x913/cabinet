@@ -26,6 +26,7 @@ class BillController extends Controller
             ->select('contract_id', 'client_id', 'bill_sum', 'bill_id', 'bill_number', DB::raw("to_char(bill_date, 'DD.MM.yyyy') as bill_date_str"))
             ->where('bill_bills.client_id', '=', $user->client_id)
             ->orderBy('bill_date', 'desc')
+            ->orderBy('contract_id')
             ->get()->toArray();
 
 
