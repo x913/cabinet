@@ -36,7 +36,10 @@ class ServiceController extends Controller
                     ->where([
                         ['client_id', '=', $user->client_id],
                         ['enabled', '=', '1'],
-                    ])->whereNull('date_expire')->get()->toArray(),
+                    ])->whereNull('date_expire')
+                        ->orderBy('phone_type')
+                        ->orderBy('user_id')
+                        ->get()->toArray(),
                 'contracts' => Contract::ClientContracts()->get()->toArray(),
                 'types' => TelephoneType::Types()->get()->toArray()
             ]
